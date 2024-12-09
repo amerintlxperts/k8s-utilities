@@ -8,10 +8,11 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     ca-certificates \
     curl \
-    && RELEASE=$(curl -s https://dl.k8s.io/release/stable.txt) && \
+    && export RELEASE=$(curl -s https://dl.k8s.io/release/stable.txt) && \
+    echo "Resolved Kubernetes release version: $RELEASE" && \
     curl -LO "https://dl.k8s.io/release/${RELEASE}/bin/linux/amd64/kubectl" && \
-    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
-    rm kubectl && \
+    chmod +x kubectl && \
+    mv kubectl /usr/local/bin/ && \
     rm -rf /var/lib/apt/lists/*
 
 # Set the default command
