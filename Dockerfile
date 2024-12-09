@@ -7,14 +7,28 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && \
     apt-get install --no-install-recommends -y \
     ca-certificates \
-    curl \
-    && export RELEASE=$(curl -s https://dl.k8s.io/release/stable.txt) && \
-    echo "Resolved Kubernetes release version: $RELEASE" && \
-    curl -LO "https://dl.k8s.io/release/${RELEASE}/bin/linux/amd64/kubectl" && \
-    chmod +x kubectl && \
-    mv kubectl /usr/local/bin/ && \
-    rm -rf /var/lib/apt/lists/*
+    curl
+
+# Download the stable Kubernetes release version
+RUN curl -s https://dl.k8s.io/release/stable.txt | tee /tmp/release.txt
+
+# Read the downloaded release version
+RUN RELEASE=$(cat /tmp/release.txt)
+
+# Print the resolved version
+RUN echo "Resolved Kubernetes release version: $RELEASE"
+
+# Download kubectl binary
+RUN curl -LO "https://dl.k8s.io/release/${RELEASE}/bin/linux/amd64/kubectl"
+
+# Make kubectl executable
+RUN chmod +x kubectl
+
+# Move kubectl to system path
+RUN mv kubectl /usr/local/bin/
+
+# Clean up temporary file
+RUN rm -rf /tmp/release.txt
 
 # Set the default command
 CMD ["/bin/bash"]
-
