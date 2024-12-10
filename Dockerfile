@@ -11,19 +11,15 @@ RUN apt-get update && \
     gnupg && \
     rm -rf /var/lib/apt/lists/*
 
-# Retrieve and set up the Kubernetes repository GPG key
-RUN curl -fsSLO "https://pkgs.k8s.io/core:/stable:/v1.28/deb/Release.key" && \
-    mkdir -p /usr/share/keyrings && \
-    gpg --dearmor < Release.key > /usr/share/keyrings/k8s-archive-keyring.gpg && \
-    rm Release.key
+# Download and install the specific version of kubectl
+RUN curl -LO "https://dl.k8s.io/release/v1.30.6/bin/linux/amd64/kubectl" && \
+    install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl && \
+    rm kubectl
 
-# Add the Kubernetes apt repository
-RUN echo "deb [signed-by=/usr/share/keyrings/k8s-archive-keyring.gpg] https://pkgs.k8s.io/core:/stable:/v1.28/deb/ /" \
-    > /etc/apt/sources.list.d/k8s.list
-
-# Update package lists and install kubectl
+# Install jq
 RUN apt-get update && \
-    apt-get install -y --no-install-recommends kubectl && \
+    apt-get install -y --no-install-recommends jq && \
     rm -rf /var/lib/apt/lists/*
 
 CMD ["/bin/bash"]
+
